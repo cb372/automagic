@@ -8,6 +8,7 @@ object InputModels {
 
   class InputClass(val a: Int, val b: String, val c: Boolean)
 
+  case class InputCaseClassWithWrongParamType(a: Int, b: Int, c: Boolean)
 }
 
 object OutputModels {
@@ -36,6 +37,15 @@ object OutputModels {
   case class OutputCaseClassWithOptionalFourthParam(a: Int, b: String, c: Boolean, d: Option[String])
 
   case class OutputCaseClassWithDefaultFourthParam(a: Int, b: String, c: Boolean, d: String = "fallback")
+
+  class OutputClassWithDefaultFourthParam(val a: Int, val b: String, val c: Boolean, val d: String = "fallback")
+
+  class OutputClassWithCompanionAndDefaultParam(val a: Int, val b: String, val c: Boolean, val d: String)
+
+  object OutputClassWithCompanionAndDefaultParam {
+    def apply(a: Int, b: String, c: Boolean, d: String = "fallback") =
+      new OutputClassWithCompanionAndDefaultParam(a, b, c, d)
+  }
 }
 
 class TransformSpec extends FlatSpec with Matchers {
@@ -69,10 +79,10 @@ class TransformSpec extends FlatSpec with Matchers {
   }
 
   it should "fail to compile if the output type is a trait" in {
-  """
+    """
     val input = new InputClass(1, "foo", true)
     val output = transform[InputClass, OutputTrait](input)
-  """ shouldNot compile
+    """ shouldNot compile
   }
 
   it should "use an override in preference to the input field" in {
@@ -94,10 +104,10 @@ class TransformSpec extends FlatSpec with Matchers {
   }
 
   it should "reject overrides for unrecognised parameters" in {
-  """
+    """
     val input = InputCaseClass(1, "foo", true)
     val output = transform[InputCaseClass, OutputCaseClass](input, "a" -> 5, "wibble" -> "bang")
-  """ shouldNot compile
+    """ shouldNot compile
   }
 
   it should "reject badly typed overrides" in {
@@ -110,50 +120,53 @@ class TransformSpec extends FlatSpec with Matchers {
   it should "fail to compile if a parameter is missing" in {
     """
     val input = InputCaseClass(1, "foo", true)
-    val output = transform[InputCaseClass, OutputCaseClassWithFourFields](input, "a" -> 5)
+    val output = transform[InputCaseClass, OutputCaseClassWithFourParams](input, "a" -> 5)
     """ shouldNot compile
   }
 
-  it should "set an Option parameter to None if no value can be found" in {
-    pending
-//    val input = InputCaseClass(1, "foo", true)
-//    val output = transform[InputCaseClass, OutputCaseClassWithFourParams](input)
-//
-//    output.a should be(1)
-//    output.b should be("wow")
-//    output.c should be(true)
-//    output.d should be(None)
+  it should "fail to compile if the parameter types do not match" in {
+    """
+    val input = InputCaseClassWithWrongParamType(1, 234, true)
+    val output = transform[InputCaseClassWithWrongParamType, OutputCaseClass](input)
+    """ shouldNot compile
   }
 
-  it should "set an Option parameter to Some(value) if a value can be found" in {
-    pending
-//    val input = InputCaseClass(1, "foo", true)
-//    val output = transform[InputCaseClass, OutputCaseClassWithOptionalFourthParam](input, "d" -> "pupi")
-//
-//    output.a should be(1)
-//    output.b should be("wow")
-//    output.c should be(true)
-//    output.d should be(Some("pupi"))
+  it should "use a default argument if no value can be found (case class)" in {
+    val input = InputCaseClass(1, "foo", true)
+    val output = transform[InputCaseClass, OutputCaseClassWithDefaultFourthParam](input)
+
+    output.a should be(1)
+    output.b should be("foo")
+    output.c should be(true)
+    output.d should be("fallback")
   }
 
-  it should "use a default argument if no value can be found" in {
-    pending
-//    val input = InputCaseClass(1, "foo", true)
-//    val output = transform[InputCaseClass, OutputCaseClassWithDefaultFourthParam](input)
-//
-//    output.a should be(1)
-//    output.b should be("wow")
-//    output.c should be(true)
-//    output.d should be("fallback")
+  it should "use a default argument if no value can be found (normal class)" in {
+    val input = InputCaseClass(1, "foo", true)
+    val output = transform[InputCaseClass, OutputClassWithDefaultFourthParam](input)
+
+    output.a should be(1)
+    output.b should be("foo")
+    output.c should be(true)
+    output.d should be("fallback")
+  }
+
+  it should "use a default argument if no value can be found (companion object apply)" in {
+    val input = InputCaseClass(1, "foo", true)
+    val output = transform[InputCaseClass, OutputClassWithCompanionAndDefaultParam](input)
+
+    output.a should be(1)
+    output.b should be("foo")
+    output.c should be(true)
+    output.d should be("fallback")
   }
 
   it should "override the default argument if a value can be found" in {
-    pending
     val input = InputCaseClass(1, "foo", true)
     val output = transform[InputCaseClass, OutputCaseClassWithDefaultFourthParam](input, "d" -> "hoge")
 
     output.a should be(1)
-    output.b should be("wow")
+    output.b should be("foo")
     output.c should be(true)
     output.d should be("hoge")
   }
