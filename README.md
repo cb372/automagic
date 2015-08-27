@@ -122,3 +122,8 @@ val myModel: MyModel = transform[TheirModel, MyModel](theirModel, "foo" -> 123, 
 
 Only works with Scala 2.11.
 
+## Acknowledgements
+
+[This blog post](http://www.strongtyped.io/blog/2014/05/23/case-class-related-macros/) by Luc Duponcheel was really helpful.
+
+I also found plenty of useful information in StackOverflow answers written by the usual suspects, chiefly Travis Brown (@travisbrown).
