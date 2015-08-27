@@ -11,6 +11,7 @@ object AutomagicBuild extends Build {
   val root = Project(id = "automagic", base = file("."))
     .settings(sonatypeSettings: _*)
     .settings(ReleasePlugin.projectSettings: _*)
+    .settings(mavenSettings: _*)
     .settings(
       organization := "com.github.cb372",
       scalaVersion := "2.11.7",
