@@ -9,6 +9,10 @@ object InputModels {
   class InputClass(val a: Int, val b: String, val c: Boolean)
 
   case class InputCaseClassWithWrongParamType(a: Int, b: Int, c: Boolean)
+
+  class InputClassWithDef(val a: Int, val b: String) {
+    def c: Boolean = true
+  }
 }
 
 object OutputModels {
@@ -63,6 +67,15 @@ class TransformSpec extends FlatSpec with Matchers {
   it should "transform a normal class to another normal class" in {
     val input = new InputClass(1, "foo", true)
     val output = transform[InputClass, OutputClass](input)
+
+    output.a should be(1)
+    output.b should be("foo")
+    output.c should be(true)
+  }
+
+  it should "use zero-arg methods on the input class as if they are fields" in {
+    val input = new InputClassWithDef(1, "foo")
+    val output = transform[InputClassWithDef, OutputClass](input)
 
     output.a should be(1)
     output.b should be("foo")

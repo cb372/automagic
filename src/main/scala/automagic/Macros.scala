@@ -13,7 +13,7 @@ class Macros(val c: Context) {
 
   def transform[From: c.WeakTypeTag, To: c.WeakTypeTag](from: c.Expr[From], overrides: c.Expr[Tuple2[String, Any]]*) = {
     val fromType = weakTypeOf[From]
-    val fromFields: Map[Name, Type] = findDeclaredFields(fromType).toMap[Name, Type]
+    val fromFields: Map[Name, Type] = findDeclaredFieldsAndZeroArgMethods(fromType).toMap[Name, Type]
 
     val toType = weakTypeOf[To]
     val classSym = toType.typeSymbol
@@ -199,9 +199,10 @@ class Macros(val c: Context) {
     applyMethods ++ classConstructors
   }
 
-  private def findDeclaredFields(tpe: Type): Iterable[(Name, Type)] = {
+  private def findDeclaredFieldsAndZeroArgMethods(tpe: Type): Iterable[(Name, Type)] = {
     tpe.decls.collect {
       case field if field.asTerm.isVal => (TermName(field.name.toString.trim), field.typeSignature)
+      case method if method.asTerm.isMethod && method.asMethod.paramLists.isEmpty => (TermName(method.name.toString.trim), method.typeSignature.resultType)
     }
   }
 
