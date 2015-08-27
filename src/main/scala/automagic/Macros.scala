@@ -28,7 +28,8 @@ class Macros(val c: Context) {
 
     val overridesMap: Map[TermName, TreeWithActualType] = parseOverrides(overrides)
 
-    val results: Seq[(MethodInfo, Either[String, MethodArgTrees])] = constructors.map{ methodInfo =>
+    // Try all the constructors, saving the result (either a list of args to pass to the constructor, or an error message) for each
+    val results: Seq[(MethodInfo, Either[String, MethodArgTrees])] = constructors.map { methodInfo =>
       methodInfo -> tryConstructor(methodInfo, tmpName, fromFields, overridesMap, companionSym)
     }
     val successfulResult = results collectFirst {
@@ -55,6 +56,9 @@ class Macros(val c: Context) {
     }
   }
 
+  /**
+   * Turn the provided overrides into a more useful form: a map from name to typed tree.
+   */
   private def parseOverrides(overrides: Seq[c.Expr[(String, Any)]]): Map[TermName, TreeWithActualType] = {
     overrides.map { ov =>
       val (key, value) = ov.tree match {
