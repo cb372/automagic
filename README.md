@@ -77,7 +77,9 @@ If it can't use any of the constructors, it gives up and gives you a compile err
 
 Automagic can be used to construct case classes, normal classes, and classes built by an `apply` method in the companion object.
 
-## Typesafe
+Note that the order of the parameters does not matter. Automagic only identifies parameters using their names and does not care about order.
+
+## Type safety
 
 All the types of the input fields and overrides are checked at compile time. If something is amiss, you'll get a nice compile error telling you what went wrong:
 

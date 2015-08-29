@@ -13,6 +13,9 @@ object InputModels {
   class InputClassWithDef(val a: Int, val b: String) {
     def c: Boolean = true
   }
+
+  case class TwoInts(a: Int, b: Int)
+
 }
 
 object OutputModels {
@@ -37,7 +40,7 @@ object OutputModels {
   trait OutputTrait
 
   case class OutputCaseClassWithFourParams(a: Int, b: String, c: Boolean, d: String)
-  
+
   case class OutputCaseClassWithOptionalFourthParam(a: Int, b: String, c: Boolean, d: Option[String])
 
   case class OutputCaseClassWithDefaultFourthParam(a: Int, b: String, c: Boolean, d: String = "fallback")
@@ -50,6 +53,9 @@ object OutputModels {
     def apply(a: Int, b: String, c: Boolean, d: String = "fallback") =
       new OutputClassWithCompanionAndDefaultParam(a, b, c, d)
   }
+
+  case class TwoIntsSwapped(b: Int, a: Int)
+
 }
 
 class TransformSpec extends FlatSpec with Matchers {
@@ -182,6 +188,13 @@ class TransformSpec extends FlatSpec with Matchers {
     output.b should be("foo")
     output.c should be(true)
     output.d should be("hoge")
+  }
+
+  it should "not care about the order of the parameters, only the names" in {
+    val input = TwoInts(1, 2)
+    val output = transform[TwoInts, TwoIntsSwapped](input)
+
+    output should be (TwoIntsSwapped(2, 1))
   }
 
 }
