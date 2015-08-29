@@ -185,14 +185,18 @@ class Macros(val c: Context) {
    */
   private def findAllConstructors(tpe: Type): Seq[MethodInfo] = {
     /**
-     * Find all `apply` methods on the companion object, sorted in decreasing order of parameter count.
+     * Find all non-private `apply` methods on the companion object, sorted in decreasing order of parameter count.
      */
     def findAllCompanionObjectApplyMethods(tpe: Type): Seq[MethodSymbol] = {
       val companion = tpe.typeSymbol.companion
       if (companion.isModule) {
         // There is a companion object. Look for all suitable `apply` methods.
         val applyMethods = companion.typeSignature.members.collect {
-          case sym if sym.isMethod && sym.asMethod.name == TermName("apply") && sym.asMethod.returnType =:= tpe => sym.asMethod
+          case sym if sym.isMethod &&
+            sym.asMethod.name == TermName("apply") &&
+            sym.asMethod.returnType =:= tpe &&
+            !sym.asMethod.isPrivate &&
+            !sym.asMethod.isPrivateThis => sym.asMethod
         }
         applyMethods.toSeq.sortBy(_.paramLists.flatten.size).reverse
       } else Nil

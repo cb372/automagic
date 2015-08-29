@@ -56,6 +56,14 @@ object OutputModels {
 
   case class TwoIntsSwapped(b: Int, a: Int)
 
+  class OutputClassWithPrivateCompanionApply private (val a: Int, val b: String, val c: Boolean)
+
+  object OutputClassWithPrivateCompanionApply {
+    private def apply(a: Int, b: String, c: Boolean): OutputClassWithPrivateCompanionApply =
+      new OutputClassWithPrivateCompanionApply(a, b, c)
+
+    def apply(a: Int, b: String): OutputClassWithPrivateCompanionApply = apply(a, b, true)
+  }
 }
 
 class TransformSpec extends FlatSpec with Matchers {
@@ -195,6 +203,15 @@ class TransformSpec extends FlatSpec with Matchers {
     val output = transform[TwoInts, TwoIntsSwapped](input)
 
     output should be (TwoIntsSwapped(2, 1))
+  }
+
+  it should "not try to call a private apply method" in {
+    val input = new InputClass(1, "foo", true)
+    val output = transform[InputClass, OutputClassWithPrivateCompanionApply](input)
+
+    output.a should be(1)
+    output.b should be("foo")
+    output.c should be(true)
   }
 
 }
