@@ -14,14 +14,15 @@ object AutomagicBuild extends Build {
     .settings(mavenSettings: _*)
     .settings(
       organization := "com.github.cb372",
-      scalaVersion := "2.11.7",
+      scalaVersion := "2.12.3",
+      crossScalaVersions := Seq("2.11.11", "2.12.3"),
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
       releasePublishArtifactsAction := PgpKeys.publishSigned.value,
       libraryDependencies <+= scalaVersion { s =>
         "org.scala-lang" % "scala-reflect" % s
       },
       libraryDependencies ++= Seq(
-        "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+        "org.scalatest" %% "scalatest" % "3.0.1" % "test"
       )
     )
 

@@ -63,6 +63,7 @@ class Macros(val c: Context) {
     overrides.map { ov =>
       val (key, value) = ov.tree match {
         case q"scala.this.Predef.ArrowAssoc[$_]($k).->[$_]($v)" => (k, v)
+        case q"scala.Predef.ArrowAssoc[$_]($k).->[$_]($v)" => (k, v)
         case q"($k, $v)" => (k, v)
         case other => c.abort(c.enclosingPosition, "You must pass overrides as either key -> value or (key, value)")
       }
