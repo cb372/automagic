@@ -16,9 +16,7 @@ object AutomagicBuild extends Build {
       organization := "com.github.cb372",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
       releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-      libraryDependencies <+= scalaVersion { s =>
-        "org.scala-lang" % "scala-reflect" % s
-      },
+      libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       libraryDependencies ++= Seq(
         "org.scalatest" %% "scalatest" % "3.0.1" % "test"
       )
@@ -45,9 +43,9 @@ object AutomagicBuild extends Build {
           <url>https://github.com/cb372</url>
         </developer>
       </developers>,
-    publishTo <<= version { v =>
+    publishTo := {
       val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
+      if (version.value.trim.endsWith("SNAPSHOT"))
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
