@@ -16,6 +16,7 @@ object AutomagicBuild extends Build {
       organization := "com.github.cb372",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
       releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+      releaseCrossBuild := true,
       libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       libraryDependencies ++= Seq(
         "org.scalatest" %% "scalatest" % "3.0.1" % "test"
