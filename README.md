@@ -104,7 +104,7 @@ All the types of the input fields and overrides are checked at compile time. If 
 In your sbt file:
 
 ```
-libraryDependencies += "com.github.cb372" %% "automagic" % "0.1"
+libraryDependencies += "com.github.cb372" %% "automagic" % "0.2.1"
 ```
 
 In your code:
@@ -122,7 +122,7 @@ val myModel: MyModel = transform[TheirModel, MyModel](theirModel, "foo" -> 123, 
 
 ## Requirements
 
-Only works with Scala 2.11.
+Works with Scala 2.11 or newer.
 
 ## Acknowledgements
 
